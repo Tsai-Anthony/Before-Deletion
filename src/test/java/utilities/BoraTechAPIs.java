@@ -7,7 +7,10 @@ import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import java.util.List;
 
+import apiPojos.Post;
+import apiPojos.PostBody;
 public class BoraTechAPIs {
 
 	public static String login(String email, String password) {
@@ -40,6 +43,36 @@ public class BoraTechAPIs {
 		User user = response.as(User.class);
 
 		return user;
+	}
+	public static Post createPost(String token, String text) {
+		String endpoint = "/api/posts";
+
+		RestAssured.baseURI = "https://boratech-practice-app.onrender.com";
+		RequestSpecification request = RestAssured.given();
+
+		request.header("x-auth-token", token);
+		request.header("Content-Type", "application/json");
+
+		PostBody postBody = new PostBody(text, false);
+
+		request.body(postBody);
+
+		Response response = request.post(endpoint);
+		Post post = response.as(Post.class);
+		return post;
+	}
+
+	public static List<Post> getPosts(String token) {
+		String endpoint = "/api/posts";
+
+		RestAssured.baseURI = "https://boratech-practice-app.onrender.com";
+		RequestSpecification request = RestAssured.given();
+
+		request.header("x-auth-token", token);
+		Response response2 = request.get(endpoint);
+
+		List<Post> posts = response2.jsonPath().getList("", Post.class);
+		return posts;
 	}
 
 }
